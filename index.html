@@ -19,26 +19,67 @@
             <div class="row">
                 <div  class="col-12 justify-content-center">
                     <label class="col-12 text-center fs-3 m-2 text-light" for="city-search">City Search Bar:</label>
-                    <input class="col-12 mx-2 form-control" id="city-search" placeholder="Search for a City">
-                    <button class="btn btn-secondary col-12 m-2" type="button">SEARCH</button>
+                    <input class="col-12 mx-2 form-control" id="city-search" autocomplete="off" placeholder="Search for a City">
+                    <button class="btn btn-secondary col-12 m-2" id="search-btn" type="submit">SEARCH</button>
                     <div class="col-12 m-2" id="city-current"></div>
-                    <div class="col-12 border-top border-light border-3 m-2" id="city-history"></div>
+                    <div class="col-12 border-top border-light border-2 m-2" id="city-history"></div>
                 </div>
             </div>
         </div>
         <div class="col-9 h-auto">
             <div class="row justify-content-center">
-                <div class="col-11 border border-1 bg-secondary shadow mt-4 p-3">
-                    <h3 class="col-12 text-light fs-3">Test City (3/5/2022) ☁</h3>
-                    <p class="col-12" id="temp">Temp: 90</p>
-                    <p class="col-12" id="wind">Wind: 5 MPH</p>
-                    <p class="col-12" id="humidity">Humidity: 29 %</p>
-                    <p class="col-12" id="uv">UV Index: <span class="bg-success rounded p-1 px-3 text-light">0.1</span></p>
+                <div id="current-conditions" class="col-6 border border-1 bg-secondary shadow mt-4 p-3">
+                    <h3 class="col-12 text-light fs-3"id="city"><image id="city-icon" src=""></image></h3>
+                    <p class="col-12" id="temp"></p>
+                    <p class="col-12" id="wind"></p>
+                    <p class="col-12" id="humidity"></p>
+                    <p class="col-12">UV Index: <span id="uvi" class="bg-success rounded p-1 px-3 text-light"></span></p>
                 </div>
-                <div class="col-11 mt-2">
+                <div id="current-forecast" class="col-11 invisible mt-2">
                     <h4 class="col-12 text-light fs-3 text-center my-3">5-Day Forecast</h4>
-                    <div class="card bg-secondary bg-gradient border border-2 p-1" style="width: 18rem;">
-                        <div class="card-title fs-3 fw-bold ">3/6/2022</div>
+                    <div class="container">
+                        <div id="forecast-container" class="row">
+                            <div class="col">
+                                <div class="bg-primary border border-light shadow p-2">
+                                    <h4 class="text-light fs-4 fw-bold border-bottom pb-2">3/22/22</h4>
+                                    <p class="text-light bg-info p-2 lh-lg fs-5">Temp: 40 <br />
+                                    Wind: 50 MPH <br />
+                                    Humidity: 40%</p>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="bg-info border border-light shadow p-2">
+                                    <h4 class="text-light fs-4 fw-bold border-bottom pb-2">3/22/22</h4>
+                                    <p class="text-light fs-5">Temp: 40</p>
+                                    <p class="text-light fs-5">Wind: 50 MPH</p>
+                                    <p class="text-light fs-5">Humidity: 40%</p>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="bg-info border border-light shadow p-2">
+                                    <h4 class="text-light fs-4 fw-bold border-bottom pb-2">3/22/22</h4>
+                                    <p class="text-light fs-5">Temp: 40</p>
+                                    <p class="text-light fs-5">Wind: 50 MPH</p>
+                                    <p class="text-light fs-5">Humidity: 40%</p>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="bg-info border border-light shadow p-2">
+                                    <h4 class="text-light fs-4 fw-bold border-bottom pb-2">3/22/22</h4>
+                                    <p class="text-light fs-5">Temp: 40</p>
+                                    <p class="text-light fs-5">Wind: 50 MPH</p>
+                                    <p class="text-light fs-5">Humidity: 40%</p>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="bg-info border border-light shadow p-2">
+                                    <h4 class="text-light fs-4 fw-bold border-bottom pb-2">3/22/22</h4>
+                                    <p class="text-light fs-5">Temp: 40</p>
+                                    <p class="text-light fs-5">Wind: 50 MPH</p>
+                                    <p class="text-light fs-5">Humidity: 40%</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
