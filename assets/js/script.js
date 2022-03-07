@@ -32,16 +32,26 @@ var getCityGeo = function(city) {
         if (response.ok) {
             response.json().then(function (data) {
                 console.log(data);
-                console.log(data[0].name);
-                var city = data[0].name;
-                var cityLat = data[0].lat;
-                var cityLon = data[0].lon;
-                if (city && !localStorage.getItem(city)){
-                    localStorage.setItem(city, city)
-                };
-               
-                createHistoryButtons();
-                getWeather(cityLat, cityLon, city)
+                if(data.length > 0) {
+                    inputFieldEl.value = "";
+                    var city = data[0].name;
+                    var cityLat = data[0].lat;
+                    var cityLon = data[0].lon;
+                    var state = data[0].state;
+    
+                    
+                    if (city && !localStorage.getItem(city)){
+                        localStorage.setItem(city, city)
+                    };
+                    if (!document.querySelector("[data-city='" + city + "'")) {
+                        createHistoryButtons(city);
+                    };
+    
+                    getWeather(cityLat, cityLon, city, state)
+                } else {
+                    alert("Unable to find that city");
+                    inputFieldEl.value = "";
+                }
             })
         } else {
             alert("There was a problem with your request")
@@ -65,33 +75,62 @@ function allStorage() {
 }
 
 
-var createHistoryButtons = function () {
-    if (allStorage() != []) {
+var createHistoryButtons = function (addBtn) {
+    if (addBtn) {
+        var cityBtnNew = document.createElement("button");
+        cityBtnNew.textContent = addBtn
+        cityBtnNew.classList.add("btn", "btn-dark", "col-11", "m-2");
+        cityBtnNew.setAttribute("data-city", addBtn)
+        cityHistoryEl.prepend(cityBtnNew);
+    } else {
 
-        for (let i = 0; i < allStorage().length; i++) {
-            var city = allStorage()[i];
-            console.log(city)
-            var cityBtn = document.createElement("button");
-            cityBtn.textContent = city;
-            cityBtn.classList.add("btn", "btn-dark", "col-11", "m-2");
-            cityHistoryEl.prepend(cityBtn);
+        if (allStorage() != []) {
+    
+            for (let i = 0; i < allStorage().length; i++) {
+                var city = allStorage()[i];
+                var cityBtn = document.createElement("button");
+                cityBtn.textContent = city;
+                cityBtn.classList.add("btn", "btn-dark", "col-11", "m-2");
+                cityBtn.setAttribute("data-city", city)
+                cityHistoryEl.prepend(cityBtn);
+            }
         }
     }
 }
 
-var getWeather = function (lat, lon, city) {
+var getWeather = function (lat, lon, city, state) {
     var apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + "&units=imperial&appid=916759247b8196a0b6fba752b7a3ccd9";
+    console.log(apiUrl);
     fetch(apiUrl)
     .then(function (response) {
         // check for failure
         if (response.ok) {
             response.json().then(function (data) {
+                // if it is a state, include it
+                if (state) {
+                    selectedCityEl.innerHTML = city + ", " + state + "<image src='http://openweathermap.org/img/wn/" + data.current.weather[0].icon + ".png'></image>"; 
+                } else {
+                    // do not include state
+                    selectedCityEl.innerHTML = city + "<image src='http://openweathermap.org/img/wn/" + data.current.weather[0].icon + ".png'></image>";
+                }
                 // fill out html
-                selectedCityEl.innerHTML = city + " " + "<image src='http://openweathermap.org/img/wn/" + data.current.weather[0].icon + ".png'></image>";
                 selectedTempEl.textContent = "Temp: " + data.current.temp + "°F";
                 selectedWindEl.textContent = "Wind: " + data.current.wind_speed + " MPH";
                 selectedHumidityEl.textContent = "Humidity: " + data.current.humidity + "%";
                 selectedUviSpan.textContent = data.current.uvi;
+                console.log(data.current.uvi);
+
+                // remove uvi backgrounds
+                selectedUviSpan.classList.remove("bg-success", "bg-warning", "bg-danger");
+
+                // uvi color coding
+                if (data.current.uvi <= 2.99 || data.current.uvi === 0) {
+                    selectedUviSpan.classList.add("bg-success");
+                } else if (data.current.uvi >= 3 && data.current.uvi <= 5.99) {
+                    selectedUviSpan.classList.add("bg-warning");
+                } else if (data.current.uvi >= 6) {
+                    selectedUviSpan.classList.add("bg-danger");
+                }
 
                 // unhide elements
                 currentConditionsEl.classList.remove("invisible");
@@ -118,8 +157,8 @@ var getWeather = function (lat, lon, city) {
                         outerDiv.appendChild(innerDiv);
     
                         var cardTitle = document.createElement("h4");
-                        cardTitle.classList.add("text-light", "fs-4", "fw-bold", "border-bottom", "pb-2");
-                        cardTitle.textContent = humanDateFormat;
+                        cardTitle.classList.add("text-light", "fs-5", "fw-bold", "border-bottom", "pb-2");
+                        cardTitle.innerHTML = humanDateFormat + "<image src='http://openweathermap.org/img/wn/" + data.daily[i].weather[0].icon + ".png'></image>";
                         // append to innerDiv
                         innerDiv.appendChild(cardTitle);
     
@@ -153,8 +192,8 @@ var getWeather = function (lat, lon, city) {
                         outerDiv.appendChild(innerDiv);
     
                         var cardTitle = document.createElement("h4");
-                        cardTitle.classList.add("text-light", "fs-4", "fw-bold", "border-bottom", "pb-2");
-                        cardTitle.textContent = humanDateFormat;
+                        cardTitle.classList.add("text-light", "fs-5", "fw-bold", "border-bottom", "pb-2");
+                        cardTitle.innerHTML = humanDateFormat + "<image src='http://openweathermap.org/img/wn/" + data.daily[i].weather[0].icon + ".png'></image>";
                         // append to innerDiv
                         innerDiv.appendChild(cardTitle);
     
@@ -174,6 +213,12 @@ var getWeather = function (lat, lon, city) {
 
 // event listeners
 searchBtnEl.addEventListener("click", getSearchCity);
+inputFieldEl.addEventListener("keyup", function (event) {
+    event.preventDefault();
+    if (event.key === "Enter") {
+        getSearchCity();
+    }
+})
 
 cityHistoryEl.addEventListener("click", function(event) {
     if (event.target) {
@@ -182,4 +227,5 @@ cityHistoryEl.addEventListener("click", function(event) {
     }
 })
 
+// call on 
 createHistoryButtons();
