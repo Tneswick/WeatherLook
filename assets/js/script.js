@@ -12,6 +12,9 @@ var searchBtnEl = document.getElementById("search-btn");
 var currentConditionsEl = document.getElementById("current-conditions");
 var currentForecastEl = document.getElementById("current-forecast");
 
+// empty array for cities storage
+var cities = [];
+
 var getSearchCity = function () {
     if (inputFieldEl.value) {
         var searchCity = inputFieldEl.value;
@@ -32,12 +35,14 @@ var getCityGeo = function(city) {
                 console.log(data);
                 console.log(data[0].name);
                 var city = data[0].name;
-                var state = data[0].state;
                 var cityLat = data[0].lat;
                 var cityLon = data[0].lon;
-                
-                createHistoryButton(city);
-                getWeather(cityLat, cityLon, city, state)
+
+                cities.push(city);
+                localStorage.setItem("cities", JSON.stringify(cities));
+                cities = []
+                createHistoryButtons();
+                getWeather(cityLat, cityLon, city)
             })
         } else {
             alert("There was a problem with your request")
@@ -45,15 +50,23 @@ var getCityGeo = function(city) {
     })
 }
 
-var createHistoryButton = function (city) {
-    var newBtn = document.createElement("button");
-    newBtn.classList.add("btn", "btn-dark", "col-11", "m-2");
-    newBtn.textContent = city;
-    cityHistoryEl.appendChild(newBtn);
+var createHistoryButtons = function () {
+    if (localStorage.getItem("cities")) {
+        var storageCities = JSON.parse(localStorage.getItem("cities"));
+        cities.push(storageCities);
 
+        for (let i = 0; i < cities.length; i++) {
+            var city = cities[i];
+            var cityBtn = document.createElement("button");
+            cityBtn.textContent = city;
+            cityBtn.classList.add("btn", "btn-dark", "col-11", "m-2", "bug-fix");
+            cityHistoryEl.prepend(cityBtn);
+        }
+        console.log(cities)
+    }
 }
 
-var getWeather = function (lat, lon, city, state) {
+var getWeather = function (lat, lon, city) {
     var apiUrl = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + "&units=imperial&appid=916759247b8196a0b6fba752b7a3ccd9";
     fetch(apiUrl)
     .then(function (response) {
@@ -61,7 +74,7 @@ var getWeather = function (lat, lon, city, state) {
         if (response.ok) {
             response.json().then(function (data) {
                 // fill out html
-                selectedCityEl.innerHTML = city + ", " + state + " " + "<image src='http://openweathermap.org/img/wn/" + data.current.weather[0].icon + ".png'></image>";
+                selectedCityEl.innerHTML = city + " " + "<image src='http://openweathermap.org/img/wn/" + data.current.weather[0].icon + ".png'></image>";
                 selectedTempEl.textContent = "Temp: " + data.current.temp + "°F";
                 selectedWindEl.textContent = "Wind: " + data.current.wind_speed + " MPH";
                 selectedHumidityEl.textContent = "Humidity: " + data.current.humidity + "%";
@@ -148,3 +161,12 @@ var getWeather = function (lat, lon, city, state) {
 
 // event listeners
 searchBtnEl.addEventListener("click", getSearchCity);
+
+cityHistoryEl.addEventListener("click", function(event) {
+    if (event.target) {
+        var city = this.textContent;
+        console.log(city, "LOOK");
+    }
+})
+
+createHistoryButtons();
