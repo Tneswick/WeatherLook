@@ -13,7 +13,6 @@ var currentConditionsEl = document.getElementById("current-conditions");
 var currentForecastEl = document.getElementById("current-forecast");
 
 // empty array for cities storage
-var cities = [];
 
 var getSearchCity = function () {
     if (inputFieldEl.value) {
@@ -37,10 +36,10 @@ var getCityGeo = function(city) {
                 var city = data[0].name;
                 var cityLat = data[0].lat;
                 var cityLon = data[0].lon;
-
-                cities.push(city);
-                localStorage.setItem("cities", JSON.stringify(cities));
-                cities = []
+                if (city && !localStorage.getItem(city)){
+                    localStorage.setItem(city, city)
+                };
+               
                 createHistoryButtons();
                 getWeather(cityLat, cityLon, city)
             })
@@ -50,19 +49,33 @@ var getCityGeo = function(city) {
     })
 }
 
-var createHistoryButtons = function () {
-    if (localStorage.getItem("cities")) {
-        var storageCities = JSON.parse(localStorage.getItem("cities"));
-        cities.push(storageCities);
+// https://stackoverflow.com/questions/17745292/how-to-retrieve-all-localstorage-items-without-knowing-the-keys-in-advance
+function allStorage() {
 
-        for (let i = 0; i < cities.length; i++) {
-            var city = cities[i];
+    var values =[ ],
+        keys = Object.keys(localStorage),
+        i = keys.length;
+
+        
+    while ( i-- ) {
+        values.push(localStorage.getItem(keys[i]) );
+    }
+
+    return values;
+}
+
+
+var createHistoryButtons = function () {
+    if (allStorage() != []) {
+
+        for (let i = 0; i < allStorage().length; i++) {
+            var city = allStorage()[i];
+            console.log(city)
             var cityBtn = document.createElement("button");
             cityBtn.textContent = city;
-            cityBtn.classList.add("btn", "btn-dark", "col-11", "m-2", "bug-fix");
+            cityBtn.classList.add("btn", "btn-dark", "col-11", "m-2");
             cityHistoryEl.prepend(cityBtn);
         }
-        console.log(cities)
     }
 }
 
@@ -164,8 +177,8 @@ searchBtnEl.addEventListener("click", getSearchCity);
 
 cityHistoryEl.addEventListener("click", function(event) {
     if (event.target) {
-        var city = this.textContent;
-        console.log(city, "LOOK");
+        var city = event.target.textContent;
+        getCityGeo(city);
     }
 })
 
