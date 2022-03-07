@@ -1,4 +1,4 @@
-# 🌫⛈ WeatherLook🌡☀
+# 🌫⛈ WeatherLook 🌡☀
 >How's the weather in...
 
 ## 📃Instructions
